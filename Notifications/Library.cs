@@ -3,25 +3,30 @@ using System.Linq;
 using BepInEx;
 using UnityEngine;
 using UnityEngine.UI;
-using static StupidTemplate.Settings;
 
 namespace StupidTemplate.Notifications
 {
     [BepInPlugin("org.gorillatag.lars.notifications2", "NotificationLibrary", "1.0.5")]
     public class NotifiLib : BaseUnityPlugin
     {
+        private static bool disableNotifications = false; // Add this variable
+
+        private Font currentFont;  // Add this variable
+
         private void Awake()
         {
             base.Logger.LogInfo("Plugin NotificationLibrary is loaded!");
+
+            // Initialize currentFont (you can customize this as needed)
+            currentFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
         }
 
         private void Init()
         {
             this.MainCamera = GameObject.Find("Main Camera");
-            this.HUDObj = new GameObject();
-            this.HUDObj2 = new GameObject();
-            this.HUDObj2.name = "NOTIFICATIONLIB_HUD_OBJ";
-            this.HUDObj.name = "NOTIFICATIONLIB_HUD_OBJ";
+            this.HUDObj = new GameObject("HUDObj");
+            this.HUDObj2 = new GameObject("NOTIFICATIONLIB_HUD_OBJ");
+
             this.HUDObj.AddComponent<Canvas>();
             this.HUDObj.AddComponent<CanvasScaler>();
             this.HUDObj.AddComponent<GraphicRaycaster>();
@@ -29,21 +34,19 @@ namespace StupidTemplate.Notifications
             this.HUDObj.GetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
             this.HUDObj.GetComponent<Canvas>().worldCamera = this.MainCamera.GetComponent<Camera>();
             this.HUDObj.GetComponent<RectTransform>().sizeDelta = new Vector2(5f, 5f);
-            this.HUDObj.GetComponent<RectTransform>().position = new Vector3(this.MainCamera.transform.position.x, this.MainCamera.transform.position.y, this.MainCamera.transform.position.z);
+            this.HUDObj.GetComponent<RectTransform>().position = this.MainCamera.transform.position;
+
             this.HUDObj2.transform.position = new Vector3(this.MainCamera.transform.position.x, this.MainCamera.transform.position.y, this.MainCamera.transform.position.z - 4.6f);
             this.HUDObj.transform.parent = this.HUDObj2.transform;
             this.HUDObj.GetComponent<RectTransform>().localPosition = new Vector3(0f, 0f, 1.6f);
+
             Vector3 eulerAngles = this.HUDObj.GetComponent<RectTransform>().rotation.eulerAngles;
             eulerAngles.y = -270f;
             this.HUDObj.transform.localScale = new Vector3(1f, 1f, 1f);
             this.HUDObj.GetComponent<RectTransform>().rotation = Quaternion.Euler(eulerAngles);
-            this.Testtext = new GameObject
-            {
-                transform =
-                {
-                    parent = this.HUDObj.transform
-                }
-            }.AddComponent<Text>();
+
+            this.Testtext = new GameObject("TestText", typeof(Text)).GetComponent<Text>();
+            this.Testtext.transform.SetParent(this.HUDObj.transform);
             this.Testtext.text = "";
             this.Testtext.fontSize = 30;
             this.Testtext.font = currentFont;
@@ -57,14 +60,15 @@ namespace StupidTemplate.Notifications
 
         private void FixedUpdate()
         {
-            bool flag = !this.HasInit && GameObject.Find("Main Camera") != null;
-            if (flag)
+            if (!this.HasInit && GameObject.Find("Main Camera") != null)
             {
                 this.Init();
                 this.HasInit = true;
             }
+
             this.HUDObj2.transform.position = new Vector3(this.MainCamera.transform.position.x, this.MainCamera.transform.position.y, this.MainCamera.transform.position.z);
             this.HUDObj2.transform.rotation = this.MainCamera.transform.rotation;
+
             if (this.Testtext.text != "")
             {
                 this.NotificationDecayTimeCounter++;
@@ -73,14 +77,16 @@ namespace StupidTemplate.Notifications
                     this.Notifilines = null;
                     this.newtext = "";
                     this.NotificationDecayTimeCounter = 0;
-                    this.Notifilines = Enumerable.ToArray<string>(Enumerable.Skip<string>(this.Testtext.text.Split(Environment.NewLine.ToCharArray()), 1));
+                    this.Notifilines = this.Testtext.text.Split(Environment.NewLine.ToCharArray()).Skip(1).ToArray();
+
                     foreach (string text in this.Notifilines)
                     {
-                        if (text != "")
+                        if (!string.IsNullOrEmpty(text))
                         {
-                            this.newtext = this.newtext + text + "\n";
+                            this.newtext += text + "\n";
                         }
                     }
+
                     this.Testtext.text = this.newtext;
                 }
             }
@@ -102,7 +108,7 @@ namespace StupidTemplate.Notifications
                         {
                             NotificationText += Environment.NewLine;
                         }
-                        NotifiLib.NotifiText.text = NotifiLib.NotifiText.text + NotificationText;
+                        NotifiLib.NotifiText.text += NotificationText;
                         NotifiLib.NotifiText.supportRichText = true;
                         NotifiLib.PreviousNotifi = NotificationText;
                     }
@@ -116,49 +122,28 @@ namespace StupidTemplate.Notifications
 
         public static void ClearAllNotifications()
         {
-            //NotifiLib.NotifiText.text = "<color=grey>[</color><color=green>SUCCESS</color><color=grey>]</color> <color=white>Notifications cleared.</color>" + Environment.NewLine;
             NotifiLib.NotifiText.text = "";
         }
 
         public static void ClearPastNotifications(int amount)
         {
-            string text = "";
-            foreach (string text2 in Enumerable.ToArray<string>(Enumerable.Skip<string>(NotifiLib.NotifiText.text.Split(Environment.NewLine.ToCharArray()), amount)))
-            {
-                if (text2 != "")
-                {
-                    text = text + text2 + "\n";
-                }
-            }
+            string text = string.Join("\n", NotifiLib.NotifiText.text.Split(Environment.NewLine.ToCharArray()).Skip(amount));
             NotifiLib.NotifiText.text = text;
         }
 
         private GameObject HUDObj;
-
         private GameObject HUDObj2;
-
         private GameObject MainCamera;
-
         private Text Testtext;
-
-        private Material AlertText = new Material(Shader.Find("GUI/Text Shader"));
-
+        private Material AlertText = new Material(Shader.Find("Standard"));
         private int NotificationDecayTime = 144;
-
         private int NotificationDecayTimeCounter;
-
         public static int NoticationThreshold = 30;
-
         private string[] Notifilines;
-
         private string newtext;
-
         public static string PreviousNotifi;
-
         private bool HasInit;
-
         private static Text NotifiText;
-
         public static bool IsEnabled = true;
     }
 }
