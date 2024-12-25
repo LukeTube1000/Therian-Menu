@@ -14,11 +14,11 @@ namespace StupidTemplate.Menu
                 new ButtonInfo { buttonText = "Settings", method =() => SettingsMods.EnterSettings(), isTogglable = false, toolTip = "Opens the main settings page for the menu."},
                 new ButtonInfo { buttonText = "Speed Boost", method =() => Speedboost.Speedboostmod(), toolTip = "More Speed"},
                 new ButtonInfo { buttonText = "Crash All", method =() => CrashAll.CrashAll2(), toolTip = "Crashes the Lobby"},
+                new ButtonInfo { buttonText = "Crash Gun", method =() => CrashGun.CrashGun2(), toolTip = "Crashes the player who is hit"},
                 new ButtonInfo { buttonText = "Platforms", method = () => Platforms.Plats(), toolTip = "Toggle platform spawning" },
                 new ButtonInfo { buttonText = "RGB Monke", method = () => Banned.MakeEveryoneRGB(), toolTip = "RGB Monke" }, // Corrected method name
                 new ButtonInfo { buttonText = "Ban Monke", method = () => Banned.ChangeBannedText(), toolTip = "Changes the banned Text" },
-                new ButtonInfo { buttonText = "regular placeholder 4", isTogglable = false},
-                new ButtonInfo { buttonText = "togglable placeholder 4"},
+                new ButtonInfo { buttonText = "Grab Rig", method = () => GrabRig.GrabRigg(), toolTip = "Grabs the rig with trigger" },
                 new ButtonInfo { buttonText = "regular placeholder 5", isTogglable = false},
                 new ButtonInfo { buttonText = "togglable placeholder 5"},
                 new ButtonInfo { buttonText = "regular placeholder 6", isTogglable = false},
