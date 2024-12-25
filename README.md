@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ii's Stupid Template
 ii's Stupid Template is a mod menu template for Gorilla Tag with custom categories and the maximum amount of customization possible. This template is meant for more advanced users, so if you're a new menu creator, this could be difficult for you.
 
@@ -14,3 +15,6 @@ No, this template is free and public for anyone to use. You are welcome to utili
 - Edit the menu visuals in `Menu/Settings.cs`
 - Add buttons in `Menu/Buttons.cs`
 - Build with `Ctrl` + `Shift` + `B`, it will get put in your plugins folder automatically
+=======
+sigma menu totally
+>>>>>>> 77693a2a8ab63d90bce1f64a6184892a2632fc95
